@@ -1,0 +1,3 @@
+marshmallow
+PyYAML
+requests

@@ -1,0 +1,7 @@
+author_name: 'Anatolii Frolov'
+trello:
+  board_name: 'Job'
+  host: 'api.trello.com'
+  member_id: 'anatolii50'
+  protocol: 'https'
+  version: 1
