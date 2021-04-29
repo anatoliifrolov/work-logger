@@ -75,6 +75,16 @@ class Args:
                            const=self._sliding_week,
                            dest='dates_computer',
                            help='Process the last seven days')
+        dates.add_argument('--this-month',
+                           action='store_const',
+                           const=self._this_month,
+                           dest='dates_computer',
+                           help='Process the current month')
+        dates.add_argument('--last-month',
+                           action='store_const',
+                           const=self._last_month,
+                           dest='dates_computer',
+                           help='Process the last month')
         dates.add_argument('--since',
                            action=SinceAction,
                            dest='dates_computer',
@@ -123,6 +133,44 @@ class Args:
     def _sliding_week(cls) -> typing.Tuple[datetime.date, datetime.date]:
         date_to = datetime.date.today()
         date_from = date_to - datetime.timedelta(weeks=1)
+        return date_from, date_to
+
+    @classmethod
+    def _this_month(cls) -> typing.Tuple[datetime.date, datetime.date]:
+        today = datetime.date.today()
+        date_from = datetime.date(year=today.year,
+                                  month=today.month,
+                                  day=1)
+
+        if today.month < 12:
+            next_month_start = datetime.date(year=today.year,
+                                             month=today.month + 1,
+                                             day=1)
+        else:
+            next_month_start = datetime.date(year=today.year + 1,
+                                             month=1,
+                                             day=1)
+
+        date_to = next_month_start - datetime.timedelta(days=1)
+        return date_from, date_to
+
+    @classmethod
+    def _last_month(cls) -> typing.Tuple[datetime.date, datetime.date]:
+        today = datetime.date.today()
+
+        if 1 < today.month:
+            date_from = datetime.date(year=today.year,
+                                      month=today.month - 1,
+                                      day=1)
+        else:
+            date_from = datetime.date(year=today.year - 1,
+                                      month=12,
+                                      day=1)
+
+        this_month_start = datetime.date(year=today.year,
+                                         month=today.month,
+                                         day=1)
+        date_to = this_month_start - datetime.timedelta(days=1)
         return date_from, date_to
 
     @property
