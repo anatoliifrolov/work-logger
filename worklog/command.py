@@ -106,17 +106,17 @@ class Args:
 
     @classmethod
     def _this_week(cls) -> typing.Tuple[datetime.date, datetime.date]:
-        date_to = datetime.date.today()
-        weekday = date_to.weekday()
-        date_from = date_to - datetime.timedelta(days=weekday)
+        today = datetime.date.today()
+        this_weekday = today.weekday()
+        date_from = today - datetime.timedelta(days=this_weekday)
+        date_to = date_from + datetime.timedelta(days=6)
         return date_from, date_to
 
     @classmethod
     def _last_week(cls) -> typing.Tuple[datetime.date, datetime.date]:
-        date_to = datetime.date.today()
-        weekday = date_to.weekday()
-        date_to -= datetime.timedelta(days=weekday + 1)
-        date_from = date_to - datetime.timedelta(days=6)
+        date_from, date_to = cls._this_week()
+        date_from -= datetime.timedelta(weeks=1)
+        date_to -= datetime.timedelta(weeks=1)
         return date_from, date_to
 
     @classmethod
