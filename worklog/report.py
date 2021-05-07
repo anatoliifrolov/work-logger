@@ -38,7 +38,7 @@ class Builder:
         line = f'{self._cfg.author_name}:'
         lines = [line]
         for task in self._tasks:
-            line = f'* {task.id} ({task.name}) - {task.list_name}'
+            line = f'{task.id} ({task.name}) - {task.list_name}'
             lines.append(line)
         return os.linesep.join(lines)
 
