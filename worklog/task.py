@@ -17,7 +17,7 @@ class FormatError(Error):
     pass
 
 
-class EmptyError(Error):
+class OutdatedError(Error):
     pass
 
 
@@ -34,6 +34,12 @@ class Model:
         if not match:
             raise FormatError(f'unexpected card name "{card.name}"')
 
+        activity_date = card.dateLastActivity.date()
+        if activity_date < date_from or date_to < activity_date:
+            raise OutdatedError(
+                f'card "{card.name}" is out of specified date range'
+            )
+
         self.logs = []
         for checklist in card.checklists:
             try:
@@ -46,11 +52,6 @@ class Model:
                 if date_to < record.date:
                     continue
                 self.logs.append(record)
-
-        if len(self.logs) == 0:
-            raise EmptyError(
-                f'no matching checklists in card "{card.name}"'
-            )
 
         self.id = match.group('id')
         self.name = match.group('name')

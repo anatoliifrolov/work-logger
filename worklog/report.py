@@ -40,18 +40,24 @@ class Builder:
         for task in self._tasks:
             line = f'{task.id} ({task.name}) - {task.list_name}'
             lines.append(line)
+
         return os.linesep.join(lines)
 
     def human(self) -> str:
         lines = []
         for task in self._tasks:
+            if len(task.logs) == 0:
+                continue
+
             line = f'{task.id} "{task.name}":'
             lines.append(line)
             for record in task.logs:
                 line = self._format_time(record.date, record.duration)
                 lines.append(line)
                 lines.extend(f'* {a}' for a in record.actions)
+
             lines.append('')
+
         return os.linesep.join(lines)
 
     def summary(self):
@@ -62,15 +68,19 @@ class Builder:
                     by_date[record.date] += record.duration
                 else:
                     by_date[record.date] = record.duration
+
         lines = []
         for date in sorted(by_date.keys()):
             if date.weekday() in (5, 6):
                 log.warning('Worked on weekends')
+
             duration = by_date[date]
             if duration != datetime.timedelta(hours=8):
                 log.warning('Worked %s on %s', duration, date)
+
             line = self._format_time(date, duration)
             lines.append(line)
+
         return os.linesep.join(lines)
 
     @classmethod

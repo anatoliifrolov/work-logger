@@ -4,7 +4,7 @@ import marshmallow
 
 import worklog.trello.check
 
-FIELDS = ('name', 'checklists', 'idList')
+FIELDS = ('name', 'checklists', 'idList', 'dateLastActivity')
 
 Model = collections.namedtuple('Model', FIELDS)
 
@@ -16,6 +16,7 @@ class Schema(marshmallow.Schema):
         required=True
     )
     idList = marshmallow.fields.Str(required=True)
+    dateLastActivity = marshmallow.fields.DateTime(required=True)
 
     class Meta:
         unknown = marshmallow.EXCLUDE
