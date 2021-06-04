@@ -3,6 +3,7 @@ import collections
 import marshmallow
 
 File = collections.namedtuple('File', ('board_name',
+                                       'exclude_pattern',
                                        'host',
                                        'member_id',
                                        'protocol',
@@ -11,6 +12,7 @@ File = collections.namedtuple('File', ('board_name',
 
 class FileSchema(marshmallow.Schema):
     board_name = marshmallow.fields.Str(required=True)
+    exclude_pattern = marshmallow.fields.Str()
     host = marshmallow.fields.Str(required=True)
     member_id = marshmallow.fields.Str(required=True)
     protocol = marshmallow.fields.Str(required=True)
@@ -42,6 +44,10 @@ class Params:
     @property
     def board_name(self) -> str:
         return self._file.board_name
+
+    @property
+    def exclude_pattern(self) -> str:
+        return self._file.exclude_pattern
 
     @property
     def host(self) -> str:

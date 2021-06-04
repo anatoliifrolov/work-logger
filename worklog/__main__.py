@@ -24,7 +24,11 @@ def main():
     lists = trello.get_lists(board)
     cards = trello.get_cards(board)
     builder = worklog.report.Builder(cfg, lists, cards)
-    reports = (builder.jira(), builder.human(), builder.summary())
+    log.info('Generating reports for %s..%s', cfg.date_from, cfg.date_to)
+    reports = (builder.weekly_status(),
+               builder.spent_time(),
+               builder.day_summaries())
+
     for report in reports:
         print('#' * 80)
         print(report)

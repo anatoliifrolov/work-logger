@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import re
 import typing
 
 import worklog.config
@@ -16,34 +17,39 @@ class Builder:
                  cfg: worklog.config.Params,
                  lists: typing.Iterable[worklog.trello.list.Model],
                  cards: typing.Iterable[worklog.trello.card.Model]):
-        log.info('Generating report for %s..%s', cfg.date_from, cfg.date_to)
         self._cfg = cfg
-
-        lists_by_id = {l.id: l for l in lists}
-
         self._tasks = []
+        lists_by_id = {l.id: l for l in lists}
         for card in cards:
             try:
                 card_list = lists_by_id[card.idList]
-                task = worklog.task.Model(card_list,
-                                          card,
-                                          cfg.date_from,
-                                          cfg.date_to)
+                task = worklog.task.Model(card_list, card, cfg)
             except worklog.task.Error as err:
                 log.warning('Task excluded from report: %s', err)
             else:
                 self._tasks.append(task)
 
-    def jira(self) -> str:
+    def weekly_status(self) -> str:
         line = f'{self._cfg.author_name}:'
         lines = [line]
         for task in self._tasks:
-            line = f'{task.id} ({task.name}) - {task.list_name}'
+            if re.match(self._cfg.trello.exclude_pattern, task.title):
+                continue
+
+            if task.status == 'to do':
+                continue
+
+            if task.status == 'done':
+                date_range = [self._cfg.date_from, self._cfg.date_to]
+                if not (date_range[0] <= task.activity_date <= date_range[-1]):
+                    continue
+
+            line = f'{task.id} ({task.name}) - {task.status}'
             lines.append(line)
 
         return os.linesep.join(lines)
 
-    def human(self) -> str:
+    def spent_time(self) -> str:
         lines = []
         for task in self._tasks:
             if len(task.logs) == 0:
@@ -60,7 +66,7 @@ class Builder:
 
         return os.linesep.join(lines)
 
-    def summary(self):
+    def day_summaries(self):
         by_date = {}
         for task in self._tasks:
             for record in task.logs:
